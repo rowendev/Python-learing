@@ -1,0 +1,53 @@
+module parking(
+    input clk,
+    input rst,
+    input enter,
+    input [2:0] car,
+    output reg gate
+);
+
+parameter IDLE = 4'b0000;
+parameter S1 = 4'b0001;
+parameter S2 = 4'b0010;
+parameter S3 = 4'b0100;
+parameter S4 = 4'b1000;
+
+reg [3:0] curr_state;
+reg [3:0] next_state;
+
+always@(posedge clk or negedge rst) begin
+ if(!rst)
+    begin
+      curr_state <= IDLE;
+      gate <= 1'bz;
+    end
+ else
+    begin
+      curr_state <= next_state;
+
+always@(*) begin
+    case(curr_state)
+      IDLE : if(enter==1'b1 && (car==3'b000||car==3'b001||car==3'b010||car==3'b011)) next_state = S1;
+             else if(enter==0'b1 && (car==3'b000||car==3'b001||car==3'b010||car==3'b011)) next_state = S3;
+             else next_state = IDLE;
+      S1   : next_state = S2;
+
+      S2   : next_state = IDLE;
+
+      S3   : next_state = S4;
+
+      S4   : next_state = IDLE;
+      default: next_state = IDLE;
+      endcase
+      end
+always@(*) begin
+  case (curr_state)
+     IDLE: gate = 1'bz;
+     S1: gate = 1'b1;
+     S2: gate = 1'b0;
+     S3: gate = 1'b1;
+     S4: gate = 1'b0;
+     default: gate = 1'bz;
+     endcase
+     end
+     endmodule
